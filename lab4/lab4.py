@@ -26,11 +26,6 @@ def init():
 
     glEnable(GL_DEPTH_TEST)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glOrtho(-1, 1, -1, 1, -1, 1) # Определяем границы рисования по горизонтали и вертикали
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
 
 # Процедура обработки специальных клавиш
 def specialkeys(key, x, y):
@@ -51,17 +46,29 @@ def specialkeys(key, x, y):
 
 def drawimagefront():
     glViewport(0, 400, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     drawfigura()
 
 def drawimageleft():
     glViewport(300, 400, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     glRotatef(90, 0, 1, 0)
     drawfigura()
 
 def drawimageup():
     glViewport(600, 400, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     glRotatef(90, 1, 0, 0)
     drawfigura()
@@ -69,6 +76,10 @@ def drawimageup():
 
 def drawimageTrimetric():
     glViewport(0, 200, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     glRotatef(-45, 1, 0, 0)
     glRotatef(-20, 0, 1, 0)
@@ -77,6 +88,10 @@ def drawimageTrimetric():
 def drawimageDimetric():
     fz = 5 / 9;
     glViewport(300, 200, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     glRotatef(m.degrees(-m.asin(fz / m.sqrt(2))), 1, 0, 0)
     glRotatef(m.degrees(m.asin(fz / m.sqrt(2 - m.pow(fz, 2)))), 0, 1, 0)
@@ -84,6 +99,10 @@ def drawimageDimetric():
 
 def drawimageIsometric():
     glViewport(600, 200, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     glRotatef(32.264, 1, 0, 0)
     glRotatef(-45, 0, 1, 0)
@@ -91,6 +110,10 @@ def drawimageIsometric():
 
 def drawimageCabinet():
     glViewport(900, 400, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     matr = numpy.array(glGetFloatv(GL_MODELVIEW_MATRIX))
     matr[2][0] = -m.cos(m.radians(45))
@@ -100,6 +123,10 @@ def drawimageCabinet():
 
 def drawimageCavalier():
     glViewport(900, 200, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(-1, 1, -1, 1, -2, 2)  # Определяем границы рисования по горизонтали и вертикали
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     matr = numpy.array(glGetFloatv(GL_MODELVIEW_MATRIX))
     matr[2][0] = -m.cos(m.radians(45)) / 2
@@ -109,12 +136,22 @@ def drawimageCavalier():
 
 def drawimagePerOnePoint():
     glViewport(0, 0, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glFrustum(-1.75, -0.25, -0.75, 0.75, 1, 3)
+    glTranslatef(-1, 0, -1.75)
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     drawfigura()
 
 
 def drawimagePerTwoPoint():
     glViewport(300, 0, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glFrustum(-0.75, 0.75, -0.75, 0.75, 1, 3)
+    glTranslatef(0, 0, -1.75)
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     glRotatef(30, 1, 0, 0)
     drawfigura()
@@ -122,9 +159,14 @@ def drawimagePerTwoPoint():
 
 def drawimagePerThreePoint():
     glViewport(600, 0, clientwidth, clientheight)
+    glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    glRotatef(30, 1, 0, 0)
+    glFrustum(-0.75, 0.75, -0.75, 0.75, 1, 3)
+    glTranslatef(0, 0, -1.75)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
     glRotatef(-45, 0, 1, 0)
+    glRotatef(30, 1, 0, 0)
     drawfigura()
 
 
@@ -231,13 +273,6 @@ def draw():
     drawimageIsometric()
     drawimageCabinet()
     drawimageCavalier()
-
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glFrustum(-0.75, 0.75, -0.75, 0.75, 1, 3)
-    glTranslatef(0, 0, -1.75)
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
 
     drawimagePerOnePoint()
     drawimagePerTwoPoint()
