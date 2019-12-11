@@ -14,15 +14,6 @@ yrot = 0
 
 array_texture = []
 
-directionalAngleY = 0
-directionalAngleX = 0
-
-positionalY = 0
-positionalX = 0
-
-cutoff = 70
-spot_exponent = 5
-
 
 # Процедура обработки специальных клавиш
 def specialkeys(key, x, y):
@@ -66,6 +57,7 @@ def init():
     glBindTexture(GL_TEXTURE_2D, 6)
     load_texture("6.bmp")
 
+
 def load_texture(file_name: str):
     global array_texture
     image = Image.open(file_name)
@@ -82,6 +74,7 @@ def load_texture(file_name: str):
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, array_texture)
 
+
 # Процедура перерисовки
 def draw():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -89,10 +82,11 @@ def draw():
 
     glRotatef(xrot, 1, 0, 0)
     glRotatef(yrot, 0, 1, 0)
-
+    glTranslate(-1, -1, 1)
     draw_cube()
 
     glutSwapBuffers()  # Выводим все нарисованное в памяти на экран
+
 
 def draw_cube():
     glPushMatrix()
@@ -192,50 +186,6 @@ def draw_cube():
     glPopMatrix()
 
 
-
-def keyPressed(key, x, y):
-    global directionalAngleY
-    global directionalAngleX
-    global positionalX
-    global positionalY
-    global spot_exponent
-    global cutoff
-
-    if key == b'a':
-        directionalAngleY -= 5
-    elif key == b'd':
-        directionalAngleY += 5
-    elif key == b'w':
-        directionalAngleX -= 5
-    elif key == b's':
-        directionalAngleX += 5
-    elif key == b'j':
-        positionalX -= 0.1
-    elif key == b'l':
-        positionalX += 0.1
-    elif key == b'i':
-        positionalY += 0.1
-    elif key == b'k':
-        positionalY -= 0.1
-    elif key == b'q':
-        if spot_exponent >= 1:
-            spot_exponent -= 1
-            print('exponent:', spot_exponent)
-    elif key == b'e':
-        if spot_exponent <= 127:
-            spot_exponent += 1
-            print('exponent:', spot_exponent)
-    elif key == b'u':
-        if cutoff >= 1:
-            cutoff -= 1
-            print('cutoff:', cutoff)
-    elif key == b'o':
-        if cutoff <= 89:
-            cutoff += 1
-            print('cutoff:', cutoff)
-    glutPostRedisplay()
-
-
 # Здесь начинается выполнение программы
 # Использовать двойную буферизацию и цвета в формате RGB (Красный, Зеленый, Синий)
 
@@ -252,7 +202,6 @@ glutCreateWindow("FEAR AND HATE IN LAS-VEGAS")
 glutDisplayFunc(draw)
 # Определяем процедуру, отвечающую за обработку клавиш
 glutSpecialFunc(specialkeys)
-glutKeyboardFunc(keyPressed)
 # Вызываем нашу функцию инициализации
 init()
 # Запускаем основной цикл
