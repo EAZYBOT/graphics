@@ -80,8 +80,8 @@ def draw():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
-    glRotatef(xrot, 1, 0, 0)
-    glRotatef(yrot, 0, 1, 0)
+    glRotatef(xRot, 1, 0, 0)
+    glRotatef(zPos, 0, 1, 0)
     glTranslate(-1, -1, 1)
     draw_cube()
 
