@@ -2,8 +2,10 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from PIL import Image
+from threading import Thread
+from time import sleep
 import numpy as np
-from imageio import imread
+import colorsys
 
 import math
 import sys
@@ -14,6 +16,7 @@ zPos = 0
 
 lightX = 0
 lightZ = 0
+treeLightH = 0
 
 global bark_texture
 global tree_texture
@@ -24,6 +27,28 @@ global wall3_texture
 global wall4_texture
 
 posDelta = 1
+
+
+def hsv2rgb(h, s, v):
+    h = float(h)
+    s = float(s)
+    v = float(v)
+    h60 = h / 60.0
+    h60f = math.floor(h60)
+    hi = int(h60f) % 6
+    f = h60 - h60f
+    p = v * (1 - s)
+    q = v * (1 - f * s)
+    t = v * (1 - (1 - f) * s)
+    r, g, b = 0, 0, 0
+    if hi == 0: r, g, b = v, t, p
+    elif hi == 1: r, g, b = q, v, p
+    elif hi == 2: r, g, b = p, v, t
+    elif hi == 3: r, g, b = p, q, v
+    elif hi == 4: r, g, b = t, p, v
+    elif hi == 5: r, g, b = v, p, q
+
+    return r, g, b
 
 
 def specialKeys(key, x, y):
@@ -44,7 +69,6 @@ def specialKeys(key, x, y):
         xRot += 5
 
     # if (key == GLUT_KEY_F1):
-    print(key)
 
     print("x={}, z={}, angle={}".format(xPos, zPos, xRot))
     glutPostRedisplay()  # Вызываем процедуру перерисовки
@@ -165,32 +189,14 @@ def drawWalls(xSize, ySize, zSize):
 def drawRoom():
     glPushMatrix()
     drawWalls(80, 40, 80)
+
+    glPushMatrix()
+    glTranslate(-20, 0, -30)
     drawTree(20, 35)
     glPopMatrix()
 
-
-def drawPlayerLight():
-    global lightZ
-    global lightX
-    global xRot
-    global xPos
-    global zPos
-
-    glPushMatrix()
-    glLoadIdentity()
-
-    glEnable(GL_LIGHT1)
-    # glTranslate(lightX, 0, -lightZ - 1)
-    # glRotate(-xRot, 0, 1, 0)
-    # glutSolidSphere(1, 5, 5)
-    glLight(GL_LIGHT1, GL_POSITION, (xPos, 0, -zPos, 1))
-    # glLight(GL_LIGHT1, GL_AMBIENT, (0.5, 0.5, 0.5, 1))
-    glLight(GL_LIGHT1, GL_DIFFUSE, (0.8, 0.8, 0.8, 1))
-    direction = (0, 1, 0)
-    print(direction)
-    glLight(GL_LIGHT1, GL_SPOT_DIRECTION, direction)
-    # glLight(GL_LIGHT1, GL_SPECULAR, (1, 1, 1, 1))
-    # glLight(GL_LIGHT1, GL_)
+    drawTreeLight()
+    drawFireplaceLight()
     glPopMatrix()
 
 
@@ -199,8 +205,6 @@ def drawTree(xSize, ySize):
 
     glTranslatef(-xSize / 2, -ySize / 2, 0)
     glEnable(GL_TEXTURE_2D)
-    # glEnable(GL_TEXTURE_GEN_S)
-    # glEnable(GL_TEXTURE_GEN_T)
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_BLEND)
@@ -230,9 +234,79 @@ def drawTree(xSize, ySize):
     glEnd()
 
     glDisable(GL_TEXTURE_2D)
-    glDisable(GL_TEXTURE_GEN_S)
-    glDisable(GL_TEXTURE_GEN_T)
     glDisable(GL_BLEND)
+
+    glPopMatrix()
+
+
+def drawTreeLight():
+    global lightZ
+    global lightX
+    global treeLightH
+
+    glPushMatrix()
+    glLoadIdentity()
+
+    colors = list(hsv2rgb(treeLightH, 0.5, 0.5))
+    colors.append(1)
+    print(colors)
+
+    glEnable(GL_LIGHT3)
+    glLight(GL_LIGHT3, GL_POSITION, (30, 30, 0, 1))
+    glLight(GL_LIGHT3, GL_DIFFUSE, colors)
+    glLight(GL_LIGHT3, GL_SPOT_DIRECTION, (0, 0, -1))
+    glLight(GL_LIGHT3, GL_SPOT_CUTOFF, 90)
+    glLight(GL_LIGHT3, GL_SPECULAR, colors)
+
+    # glLight(GL_LIGHT3, GL_CONSTANT_ATTENUATION, 0)
+    # glLight(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, 0.000)
+    glPopMatrix()
+
+
+def drawPlayerLight():
+    global lightZ
+    global lightX
+    global xRot
+    global xPos
+    global zPos
+
+    glPushMatrix()
+    glLoadIdentity()
+
+    glEnable(GL_LIGHT1)
+    # glTranslate(lightX, 0, -lightZ - 1)
+    # glRotate(-xRot, 0, 1, 0)
+    # glutSolidSphere(1, 5, 5)
+    glLight(GL_LIGHT1, GL_POSITION, (xPos, 0, -zPos, 1))
+    # glLight(GL_LIGHT1, GL_AMBIENT, (0.5, 0.5, 0.5, 1))
+    glLight(GL_LIGHT1, GL_DIFFUSE, (0.8, 0.8, 0.8, 1))
+    direction = (0, 1, 0)
+    glLight(GL_LIGHT1, GL_SPOT_DIRECTION, direction)
+    # glLight(GL_LIGHT1, GL_SPECULAR, (1, 1, 1, 1))
+    # glLight(GL_LIGHT1, GL_)
+    glPopMatrix()
+
+
+def convertColors(r, g, b, a):
+    return r / 255, g / 255, b / 255, a / 255
+
+
+def drawFireplaceLight():
+    global lightZ
+    global lightX
+
+    glPushMatrix()
+    glLoadIdentity()
+
+    glEnable(GL_LIGHT2)
+    glLight(GL_LIGHT2, GL_POSITION, (0, 1, 75, 1))
+    glLight(GL_LIGHT2, GL_DIFFUSE, convertColors(241, 128, 53, 255))
+    glLight(GL_LIGHT2, GL_SPOT_DIRECTION, (0, 0, -1))
+    glLight(GL_LIGHT2, GL_SPOT_CUTOFF, 90)
+    glLight(GL_LIGHT2, GL_SPECULAR, convertColors(241, 128, 53, 255))
+
+    glLight(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 0)
+    glLight(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.0008)
     glPopMatrix()
 
 
@@ -246,7 +320,7 @@ def draw():
     glLoadIdentity()
     # glPushMatrix()
     glMatrixMode(GL_MODELVIEW)
-    drawPlayerLight()
+    # drawPlayerLight()
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -277,9 +351,10 @@ def init():
 
     glMatrixMode(GL_MODELVIEW)
     glEnable(GL_DEPTH_TEST)
-    # glEnable(GL_LIGHTING)  # Включаем освещение
-    glEnable(GL_LIGHT1)
-    glEnable(GL_LIGHT0)
+    glEnable(GL_LIGHTING)  # Включаем освещение
+    # glEnable(GL_LIGHT1)
+    glEnable(GL_LIGHT2)
+    # glEnable(GL_LIGHT0)
     glShadeModel(GL_SMOOTH)
     glEnable(GL_AUTO_NORMAL)
     glAlphaFunc(GL_GREATER, 0.5)
@@ -313,6 +388,16 @@ def keyPressed(key, x, y):
     glutPostRedisplay()
 
 
+def threadFunc(arg):
+    global treeLightH
+
+    while True:
+        treeLightH += 1
+        treeLightH %= 360
+        sleep(0.015)
+        glutPostRedisplay()
+
+
 if __name__ == '__main__':
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
     glutInitWindowSize(800, 800)
@@ -326,5 +411,8 @@ if __name__ == '__main__':
     glutKeyboardFunc(keyPressed)
 
     init()
-
+    thread = Thread(target=threadFunc, args=(1,))
+    thread.start()
+    # thread.join()
     glutMainLoop()
+
