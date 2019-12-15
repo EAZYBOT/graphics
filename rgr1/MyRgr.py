@@ -102,6 +102,13 @@ def load_texture(file_name: str):
 def drawWalls(xSize, ySize, zSize):
     glPushMatrix()
 
+    # glEnable(GL_CULL_FACE)
+    glCullFace(GL_BACK)
+    glFrontFace(GL_CW)
+
+    glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, (1, 0.5, 1, 1))
+    glMaterial(GL_FRONT_AND_BACK, GL_SHININESS, 50)
+
     glTranslatef(-xSize / 2, -ySize / 2, -zSize / 2)
     glEnable(GL_TEXTURE_2D)
 
@@ -110,12 +117,15 @@ def drawWalls(xSize, ySize, zSize):
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
     glVertex3f(0, 0, 0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(xSize, 0, 0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(xSize, ySize, 0)
+
     glTexCoord2f(0.0, 1.0)
     glVertex3f(0, ySize, 0)
+
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(xSize, ySize, 0)
+
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(xSize, 0, 0)
     glEnd()
 
     # back
@@ -123,12 +133,15 @@ def drawWalls(xSize, ySize, zSize):
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 1.0)
     glVertex3f(0, ySize, zSize)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(xSize, ySize, zSize)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(xSize, 0, zSize)
+
     glTexCoord2f(0.0, 0.0)
     glVertex3f(0, 0, zSize)
+
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(xSize, 0, zSize)
+
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(xSize, ySize, zSize)
     glEnd()
 
     # right
@@ -149,12 +162,15 @@ def drawWalls(xSize, ySize, zSize):
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
     glVertex3f(0, 0, 0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(0, ySize, 0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(0, ySize, zSize)
+
     glTexCoord2f(1.0, 0.0)
     glVertex3f(0, 0, zSize)
+
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(0, ySize, zSize)
+
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(0, ySize, 0)
     glEnd()
 
     # bottom
@@ -174,12 +190,16 @@ def drawWalls(xSize, ySize, zSize):
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
     glVertex3f(0, ySize, 0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(xSize, ySize, 0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(xSize, ySize, zSize)
+
     glTexCoord2f(0.0, 1.0)
     glVertex3f(0, ySize, zSize)
+
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(xSize, ySize, zSize)
+
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(xSize, ySize, 0)
+
     glEnd()
 
     glDisable(GL_TEXTURE_2D)
@@ -203,6 +223,7 @@ def drawRoom():
 def drawTree(xSize, ySize):
     glPushMatrix()
 
+    glDisable(GL_CULL_FACE)
     glTranslatef(-xSize / 2, -ySize / 2, 0)
     glEnable(GL_TEXTURE_2D)
 
@@ -252,11 +273,11 @@ def drawTreeLight():
     print(colors)
 
     glEnable(GL_LIGHT3)
-    glLight(GL_LIGHT3, GL_POSITION, (30, 30, 0, 1))
+    glLight(GL_LIGHT3, GL_POSITION, (0, 30, 0, 1))
     glLight(GL_LIGHT3, GL_DIFFUSE, colors)
     glLight(GL_LIGHT3, GL_SPOT_DIRECTION, (0, 0, -1))
     glLight(GL_LIGHT3, GL_SPOT_CUTOFF, 90)
-    glLight(GL_LIGHT3, GL_SPECULAR, colors)
+    glLight(GL_LIGHT3, GL_SPECULAR, (1, 1, 1, 1))
 
     # glLight(GL_LIGHT3, GL_CONSTANT_ATTENUATION, 0)
     # glLight(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, 0.000)
@@ -270,20 +291,18 @@ def drawPlayerLight():
     global xPos
     global zPos
 
+    glMatrixMode(GL_MODELVIEW)
     glPushMatrix()
     glLoadIdentity()
-
+    glTranslate(xPos, 0, -zPos + 20)
     glEnable(GL_LIGHT1)
-    # glTranslate(lightX, 0, -lightZ - 1)
-    # glRotate(-xRot, 0, 1, 0)
-    # glutSolidSphere(1, 5, 5)
-    glLight(GL_LIGHT1, GL_POSITION, (xPos, 0, -zPos, 1))
-    # glLight(GL_LIGHT1, GL_AMBIENT, (0.5, 0.5, 0.5, 1))
-    glLight(GL_LIGHT1, GL_DIFFUSE, (0.8, 0.8, 0.8, 1))
+    glLight(GL_LIGHT1, GL_POSITION, (xPos, 0, -zPos + 20, 1))
+    glLight(GL_LIGHT1, GL_AMBIENT, (0.2, 0.2, 0.2, 1))
+    glLight(GL_LIGHT1, GL_DIFFUSE, (0.4, 0.4, 0.4, 1))
     direction = (0, 1, 0)
     glLight(GL_LIGHT1, GL_SPOT_DIRECTION, direction)
-    # glLight(GL_LIGHT1, GL_SPECULAR, (1, 1, 1, 1))
-    # glLight(GL_LIGHT1, GL_)
+    glLight(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0)
+    glLight(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0004)
     glPopMatrix()
 
 
@@ -320,11 +339,11 @@ def draw():
     glLoadIdentity()
     # glPushMatrix()
     glMatrixMode(GL_MODELVIEW)
-    # drawPlayerLight()
+    drawPlayerLight()
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 100.0)
+    glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 500.0)
     # glRotate(-90, 0, 1, 0)
     glRotate(xRot, 0, 1, 0)
     glTranslate(-xPos, 0, zPos)

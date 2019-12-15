@@ -115,7 +115,7 @@ def draw():
     glMaterial(GL_FRONT, GL_DIFFUSE, (0.9, 0.9, 0.2, 1))
     glutSolidCube(1)
 
-    # draw_directional_light()
+    draw_directional_light()
     draw_positional_light()
 
     glutSwapBuffers()  # Выводим все нарисованное в памяти на экран
