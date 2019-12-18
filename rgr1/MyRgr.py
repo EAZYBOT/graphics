@@ -18,6 +18,8 @@ playerHeight = 0
 isPlayerLightEnabled = True
 isTreeLightEnabled = True
 isFireplaceLightEnabled = True
+isMoonLightEnabled = True
+
 lightX = 0
 lightZ = 0
 treeLightH = 0
@@ -65,15 +67,40 @@ def togglePlayerLight():
     global isPlayerLightEnabled
     isPlayerLightEnabled = (isPlayerLightEnabled != True)
 
+    if isPlayerLightEnabled:
+        glEnable(GL_LIGHT1)
+    else:
+        glDisable(GL_LIGHT1)
+
 
 def toggleFireplaceLight():
     global isFireplaceLightEnabled
     isFireplaceLightEnabled = (isFireplaceLightEnabled != True)
 
+    if isFireplaceLightEnabled:
+        glEnable(GL_LIGHT2)
+    else:
+        glDisable(GL_LIGHT2)
+
 
 def toggleTreeLight():
     global isTreeLightEnabled
     isTreeLightEnabled = (isTreeLightEnabled != True)
+
+    if isTreeLightEnabled:
+        glEnable(GL_LIGHT3)
+    else:
+        glDisable(GL_LIGHT3)
+
+
+def toggleMoonLight():
+    global isMoonLightEnabled
+    isMoonLightEnabled = (isMoonLightEnabled != True)
+
+    if isMoonLightEnabled:
+        glEnable(GL_LIGHT4)
+    else:
+        glDisable(GL_LIGHT4)
 
 
 def specialKeys(key, x, y):
@@ -106,7 +133,9 @@ def specialKeys(key, x, y):
     if key == GLUT_KEY_F3:
         toggleTreeLight()
         print("Tree light toggled")
-    # if (key == GLUT_KEY_F1):
+    if key == GLUT_KEY_F4:
+        toggleMoonLight()
+        print("Moon light toggled")
 
     print("x={}, z={}, angle={}".format(xPos, zPos, xRot))
     glutPostRedisplay()  # Вызываем процедуру перерисовки
@@ -349,6 +378,18 @@ def drawPlayerLight():
         glDisable(GL_LIGHT1)
 
 
+def drawMoonLight():
+    glPushMatrix()
+    glLoadIdentity()
+    color = convertColors(0, 14, 60, 255)
+
+    # glLight(GL_LIGHT4, GL_POSITION, (1, 1, -1, 0))
+    glLight(GL_LIGHT4, GL_POSITION, (0, 0, 1, 0))
+    glLight(GL_LIGHT4, GL_DIFFUSE, color)
+    glLight(GL_LIGHT4, GL_SPECULAR, color)
+    glPopMatrix()
+
+
 def convertColors(r, g, b, a):
     return r / 255, g / 255, b / 255, a / 255
 
@@ -386,6 +427,7 @@ def draw():
     # glPushMatrix()
     glMatrixMode(GL_MODELVIEW)
     drawPlayerLight()
+    drawMoonLight()
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -426,6 +468,11 @@ def init():
     glEnable(GL_AUTO_NORMAL)
     glAlphaFunc(GL_GREATER, 0.5)
     glEnable(GL_ALPHA_TEST)
+
+    glEnable(GL_LIGHT1)
+    glEnable(GL_LIGHT2)
+    glEnable(GL_LIGHT3)
+    glEnable(GL_LIGHT4)
 
     tree_texture = load_texture("tree.png")
     bark_texture = load_texture("bark.jpg")
