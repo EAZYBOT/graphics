@@ -13,7 +13,11 @@ import sys
 xRot = 0
 xPos = 0
 zPos = 0
+playerHeight = 0
 
+isPlayerLightEnabled = True
+isTreeLightEnabled = True
+isFireplaceLightEnabled = True
 lightX = 0
 lightZ = 0
 treeLightH = 0
@@ -41,33 +45,67 @@ def hsv2rgb(h, s, v):
     q = v * (1 - f * s)
     t = v * (1 - (1 - f) * s)
     r, g, b = 0, 0, 0
-    if hi == 0: r, g, b = v, t, p
-    elif hi == 1: r, g, b = q, v, p
-    elif hi == 2: r, g, b = p, v, t
-    elif hi == 3: r, g, b = p, q, v
-    elif hi == 4: r, g, b = t, p, v
-    elif hi == 5: r, g, b = v, p, q
+    if hi == 0:
+        r, g, b = v, t, p
+    elif hi == 1:
+        r, g, b = q, v, p
+    elif hi == 2:
+        r, g, b = p, v, t
+    elif hi == 3:
+        r, g, b = p, q, v
+    elif hi == 4:
+        r, g, b = t, p, v
+    elif hi == 5:
+        r, g, b = v, p, q
 
     return r, g, b
+
+
+def togglePlayerLight():
+    global isPlayerLightEnabled
+    isPlayerLightEnabled = (isPlayerLightEnabled != True)
+
+
+def toggleFireplaceLight():
+    global isFireplaceLightEnabled
+    isFireplaceLightEnabled = (isFireplaceLightEnabled != True)
+
+
+def toggleTreeLight():
+    global isTreeLightEnabled
+    isTreeLightEnabled = (isTreeLightEnabled != True)
 
 
 def specialKeys(key, x, y):
     global xRot
     global zPos
     global xPos
+    global playerHeight
 
     # Обработчики для клавиш со стрелками
     if key == GLUT_KEY_UP:  # Клавиша вверх
         zPos += posDelta * math.cos(math.radians(xRot))
         xPos += posDelta * math.sin(math.radians(xRot))
+        playerHeight += 15
+        playerHeight %= 180
     if key == GLUT_KEY_DOWN:  # Клавиша вниз
         zPos -= posDelta * math.cos(math.radians(xRot))
         xPos -= posDelta * math.sin(math.radians(xRot))
+        playerHeight -= 15
+        playerHeight %= 180
     if key == GLUT_KEY_LEFT:  # Клавиша влево
         xRot -= 5
     if key == GLUT_KEY_RIGHT:  # Клавиша вправо
         xRot += 5
-
+    if key == GLUT_KEY_F1:
+        togglePlayerLight()
+        print("Player light toggled")
+    if key == GLUT_KEY_F2:
+        toggleFireplaceLight()
+        print("Fireplace light toggled")
+    if key == GLUT_KEY_F3:
+        toggleTreeLight()
+        print("Tree light toggled")
     # if (key == GLUT_KEY_F1):
 
     print("x={}, z={}, angle={}".format(xPos, zPos, xRot))
@@ -265,23 +303,25 @@ def drawTreeLight():
     global lightX
     global treeLightH
 
-    glPushMatrix()
-    glLoadIdentity()
+    if isTreeLightEnabled:
+        glPushMatrix()
+        glLoadIdentity()
 
-    colors = list(hsv2rgb(treeLightH, 0.5, 0.5))
-    colors.append(1)
-    print(colors)
+        colors = list(hsv2rgb(treeLightH, 0.5, 0.5))
+        colors.append(1)
 
-    glEnable(GL_LIGHT3)
-    glLight(GL_LIGHT3, GL_POSITION, (0, 30, 0, 1))
-    glLight(GL_LIGHT3, GL_DIFFUSE, colors)
-    glLight(GL_LIGHT3, GL_SPOT_DIRECTION, (0, 0, -1))
-    glLight(GL_LIGHT3, GL_SPOT_CUTOFF, 90)
-    glLight(GL_LIGHT3, GL_SPECULAR, (1, 1, 1, 1))
+        glEnable(GL_LIGHT3)
+        glLight(GL_LIGHT3, GL_POSITION, (0, 30, 0, 1))
+        glLight(GL_LIGHT3, GL_DIFFUSE, colors)
+        glLight(GL_LIGHT3, GL_SPOT_DIRECTION, (0, 0, -1))
+        glLight(GL_LIGHT3, GL_SPOT_CUTOFF, 90)
+        glLight(GL_LIGHT3, GL_SPECULAR, (1, 1, 1, 1))
 
-    # glLight(GL_LIGHT3, GL_CONSTANT_ATTENUATION, 0)
-    # glLight(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, 0.000)
-    glPopMatrix()
+        # glLight(GL_LIGHT3, GL_CONSTANT_ATTENUATION, 0)
+        # glLight(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, 0.000)
+        glPopMatrix()
+    else:
+        glDisable(GL_LIGHT3)
 
 
 def drawPlayerLight():
@@ -291,19 +331,22 @@ def drawPlayerLight():
     global xPos
     global zPos
 
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
-    glLoadIdentity()
-    glTranslate(xPos, 0, -zPos + 20)
-    glEnable(GL_LIGHT1)
-    glLight(GL_LIGHT1, GL_POSITION, (xPos, 0, -zPos + 20, 1))
-    glLight(GL_LIGHT1, GL_AMBIENT, (0.2, 0.2, 0.2, 1))
-    glLight(GL_LIGHT1, GL_DIFFUSE, (0.4, 0.4, 0.4, 1))
-    direction = (0, 1, 0)
-    glLight(GL_LIGHT1, GL_SPOT_DIRECTION, direction)
-    glLight(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0)
-    glLight(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0004)
-    glPopMatrix()
+    if isPlayerLightEnabled:
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+        glLoadIdentity()
+        glTranslate(xPos, 0, -zPos + 20)
+        glEnable(GL_LIGHT1)
+        glLight(GL_LIGHT1, GL_POSITION, (xPos, 0, -zPos + 20, 1))
+        glLight(GL_LIGHT1, GL_AMBIENT, (0.2, 0.2, 0.2, 1))
+        glLight(GL_LIGHT1, GL_DIFFUSE, (0.4, 0.4, 0.4, 1))
+        direction = (0, 1, 0)
+        glLight(GL_LIGHT1, GL_SPOT_DIRECTION, direction)
+        glLight(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0)
+        glLight(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0004)
+        glPopMatrix()
+    else:
+        glDisable(GL_LIGHT1)
 
 
 def convertColors(r, g, b, a):
@@ -314,19 +357,22 @@ def drawFireplaceLight():
     global lightZ
     global lightX
 
-    glPushMatrix()
-    glLoadIdentity()
+    if isFireplaceLightEnabled:
+        glPushMatrix()
+        glLoadIdentity()
 
-    glEnable(GL_LIGHT2)
-    glLight(GL_LIGHT2, GL_POSITION, (0, 1, 75, 1))
-    glLight(GL_LIGHT2, GL_DIFFUSE, convertColors(241, 128, 53, 255))
-    glLight(GL_LIGHT2, GL_SPOT_DIRECTION, (0, 0, -1))
-    glLight(GL_LIGHT2, GL_SPOT_CUTOFF, 90)
-    glLight(GL_LIGHT2, GL_SPECULAR, convertColors(241, 128, 53, 255))
+        glEnable(GL_LIGHT2)
+        glLight(GL_LIGHT2, GL_POSITION, (0, 1, 75, 1))
+        glLight(GL_LIGHT2, GL_DIFFUSE, convertColors(241, 128, 53, 255))
+        glLight(GL_LIGHT2, GL_SPOT_DIRECTION, (0, 0, -1))
+        glLight(GL_LIGHT2, GL_SPOT_CUTOFF, 90)
+        glLight(GL_LIGHT2, GL_SPECULAR, convertColors(241, 128, 53, 255))
 
-    glLight(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 0)
-    glLight(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.0008)
-    glPopMatrix()
+        glLight(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 0)
+        glLight(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.0008)
+        glPopMatrix()
+    else:
+        glDisable(GL_LIGHT2)
 
 
 # Процедура перерисовки
@@ -346,7 +392,9 @@ def draw():
     glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 500.0)
     # glRotate(-90, 0, 1, 0)
     glRotate(xRot, 0, 1, 0)
-    glTranslate(-xPos, 0, zPos)
+
+    y = -math.sin(math.radians(playerHeight)) * 3
+    glTranslate(-xPos, y, zPos)
     glMatrixMode(GL_MODELVIEW)
     # glPopMatrix()
 
@@ -434,4 +482,3 @@ if __name__ == '__main__':
     thread.start()
     # thread.join()
     glutMainLoop()
-
