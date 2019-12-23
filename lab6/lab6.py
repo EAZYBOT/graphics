@@ -12,6 +12,8 @@ a = 0.5
 xrot = 0
 yrot = 0
 
+zpos = 0
+
 array_texture = []
 
 
@@ -34,13 +36,25 @@ def specialkeys(key, x, y):
     glutPostRedisplay()  # Вызываем процедуру перерисовки
 
 
+def keyPressed(key, x, y):
+    global zpos
+
+    if key == b"w":
+        zpos += 1
+    elif key == b"s":
+        zpos -= 1
+
+    glutPostRedisplay()
+
+
 # Процедура инициализации
 def init():
     glClearColor(a, 0.5, 0.5, 1.0)
     glMatrixMode(GL_PROJECTION)
-    glOrtho(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0)  # Определяем границы рисования по горизонтали и вертикали
+    glFrustum(-5.0, 5.0, -5.0, 5.0, 5.0, 200.0)  # Определяем границы рисования по горизонтали и вертикали
     glMatrixMode(GL_MODELVIEW)
     glEnable(GL_DEPTH_TEST)
+    glEnable(GL_AUTO_NORMAL)
     glEnable(GL_TEXTURE_2D)
     glEnable(GL_TEXTURE_GEN_S)
     glEnable(GL_TEXTURE_GEN_T)
@@ -67,24 +81,40 @@ def load_texture(file_name: str):
     array_texture = np.asarray(image, dtype='uint8')
     array_texture = array_texture[::-1]
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, array_texture)
 
+    for i in range(1, 3):
+        extra_file_name = file_name.replace(".bmp", "")
+        extra_file_name = "{}{}.bmp".format(extra_file_name, i)
+        image = Image.open(extra_file_name)
+        image.load()  # this is not a list, nor is it list()'able
+        width, height = image.size
+
+        array_texture = np.asarray(image, dtype='uint8')
+        array_texture = array_texture[::-1]
+        glTexImage2D(GL_TEXTURE_2D, i, GL_RGB, width, height,
+                     0, GL_RGB, GL_UNSIGNED_BYTE, array_texture)
+
 
 # Процедура перерисовки
 def draw():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
+    glPushMatrix()
 
-    glRotatef(xRot, 1, 0, 0)
-    glRotatef(zPos, 0, 1, 0)
+    glTranslate(-1, -1, zpos)
+    print(zpos)
+    glRotatef(xrot, 1, 0, 0)
+    glRotatef(yrot, 0, 1, 0)
     glTranslate(-1, -1, 1)
     draw_cube()
 
+    glPopMatrix()
     glutSwapBuffers()  # Выводим все нарисованное в памяти на экран
 
 
@@ -202,6 +232,7 @@ glutCreateWindow("FEAR AND HATE IN LAS-VEGAS")
 glutDisplayFunc(draw)
 # Определяем процедуру, отвечающую за обработку клавиш
 glutSpecialFunc(specialkeys)
+glutKeyboardFunc(keyPressed)
 # Вызываем нашу функцию инициализации
 init()
 # Запускаем основной цикл
