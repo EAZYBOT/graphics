@@ -6,15 +6,15 @@ import sys
 import math
 
 # Объявляем все глобальные переменные
-global xrot  # Величина вращения по оси x
-global yrot  # Величина вращения по оси y
+global xRot  # Величина вращения по оси x
+global zPos  # Величина вращения по оси y
 a = 0.5
 
 
 # Процедура инициализации
 def init():
-    global xrot  # Величина вращения по оси x
-    global yrot  # Величина вращения по оси y
+    global xRot  # Величина вращения по оси x
+    global zPos  # Величина вращения по оси y
 
     xrot = 0.0  # Величина вращения по оси x = 0
     yrot = 0.0  # Величина вращения по оси y = 0
@@ -28,8 +28,8 @@ def init():
 
 # Процедура обработки специальных клавиш
 def specialkeys(key, x, y):
-    global xrot
-    global yrot
+    global xRot
+    global zPos
 
     # Обработчики для клавиш со стрелками
     if key == GLUT_KEY_UP:  # Клавиша вверх

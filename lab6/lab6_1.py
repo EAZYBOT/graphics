@@ -56,46 +56,28 @@ def init():
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_AUTO_NORMAL)
     glEnable(GL_TEXTURE_2D)
-    glEnable(GL_TEXTURE_GEN_S)
-    glEnable(GL_TEXTURE_GEN_T)
-    glBindTexture(GL_TEXTURE_2D, 1)
-    load_texture("1.bmp")
-    glBindTexture(GL_TEXTURE_2D, 2)
-    load_texture("2.bmp")
-    glBindTexture(GL_TEXTURE_2D, 3)
-    load_texture("3.bmp")
-    glBindTexture(GL_TEXTURE_2D, 4)
-    load_texture("4.bmp")
-    glBindTexture(GL_TEXTURE_2D, 5)
-    load_texture("5.bmp")
-    glBindTexture(GL_TEXTURE_2D, 6)
-    load_texture("6.bmp")
+    load_texture()
 
 
-def load_texture(file_name: str):
+def load_texture():
     global array_texture
-    image = Image.open(file_name)
-    image.load()  # this is not a list, nor is it list()'able
-    width, height = image.size
-
-    array_texture = np.asarray(image, dtype='uint8')
-    array_texture = array_texture[::-1]
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, array_texture)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR)
 
-    for i in range(1, 3):
-        extra_file_name = file_name.replace(".bmp", "")
-        extra_file_name = "{}{}.bmp".format(extra_file_name, i)
-        image = Image.open(extra_file_name)
+    file_names = []
+    for i in range(8):
+        file_names.append("textures/{}.bmp".format(2 ** i))
+    file_names.reverse()
+
+    for i, file_name in enumerate(file_names):
+        image = Image.open(file_names[i])
         image.load()  # this is not a list, nor is it list()'able
         width, height = image.size
 
-        array_texture = np.asarray(image, dtype='uint8')
-        array_texture = array_texture[::-1]
+        array_texture = image.tobytes("raw", "RGB", 0, -1)
         glTexImage2D(GL_TEXTURE_2D, i, GL_RGB, width, height,
                      0, GL_RGB, GL_UNSIGNED_BYTE, array_texture)
 
@@ -107,113 +89,30 @@ def draw():
     glLoadIdentity()
     glPushMatrix()
 
-    glTranslate(-1, -1, zpos)
+    glTranslate(0, 0, zpos)
     print(zpos)
     glRotatef(xrot, 1, 0, 0)
     glRotatef(yrot, 0, 1, 0)
-    glTranslate(-1, -1, 1)
-    draw_cube()
+    # glTranslate(-1, -1, 1)
+    draw_edge(5, 5)
 
     glPopMatrix()
     glutSwapBuffers()  # Выводим все нарисованное в памяти на экран
 
 
-def draw_cube():
-    glPushMatrix()
-
-    ss = [0.5, 0.0, 0.0]
-    tt = [0.0, 0.5, 0.0]
-    glTexGenf(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR)
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, ss)
-
-    glTexGenf(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR)
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, tt)
-
-    glBindTexture(GL_TEXTURE_2D, 1)
+def draw_edge(xSize, ySize):
+    glTranslatef(-xSize / 2, -ySize / 2, 0)
 
     glBegin(GL_POLYGON)
+    glTexCoord2f(0.0, 0.0)
     glVertex3f(0, 0, 0)
-    glVertex3f(2, 0, 0)
-    glVertex3f(2, 2, 0)
-    glVertex3f(0, 2, 0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(xSize, 0, 0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(xSize, ySize, 0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(0, ySize, 0)
     glEnd()
-
-    ss = [0.0, 0.0, -0.5]
-    tt = [0.0, 0.5, 0.0]
-
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, ss)
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, tt)
-
-    glBindTexture(GL_TEXTURE_2D, 2)
-
-    glBegin(GL_POLYGON)
-    glVertex3f(2, 0, 0)
-    glVertex3f(2, 2, 0)
-    glVertex3f(2, 2, -2)
-    glVertex3f(2, 0, -2)
-    glEnd()
-
-    ss = [-0.5, 0.0, 0.0]
-    tt = [0.0, 0.5, 0.0]
-
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, ss)
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, tt)
-
-    glBindTexture(GL_TEXTURE_2D, 6)
-
-    glBegin(GL_POLYGON)
-    glVertex3f(2, 0, -2)
-    glVertex3f(2, 2, -2)
-    glVertex3f(0, 2, -2)
-    glVertex3f(0, 0, -2)
-    glEnd()
-
-    ss = [0.0, 0.0, 0.5]
-    tt = [0.0, 0.5, 0.0]
-
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, ss)
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, tt)
-
-    glBindTexture(GL_TEXTURE_2D, 5)
-
-    glBegin(GL_POLYGON)
-    glVertex3f(0, 0, -2)
-    glVertex3f(0, 2, -2)
-    glVertex3f(0, 2, 0)
-    glVertex3f(0, 0, 0)
-    glEnd()
-
-    ss = [0.5, 0.0, 0.0]
-    tt = [0.0, 0.0, -0.5]
-
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, ss)
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, tt)
-
-    glBindTexture(GL_TEXTURE_2D, 3)
-
-    glBegin(GL_POLYGON)
-    glVertex3f(0, 2, 0)
-    glVertex3f(0, 2, -2)
-    glVertex3f(2, 2, -2)
-    glVertex3f(2, 2, 0)
-    glEnd()
-
-    ss = [0.5, 0.0, 0.0]
-    tt = [0.0, 0.0, 0.5]
-
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, ss)
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, tt)
-
-    glBindTexture(GL_TEXTURE_2D, 4)
-
-    glBegin(GL_POLYGON)
-    glVertex3f(0, 0, 0)
-    glVertex3f(0, 0, -2)
-    glVertex3f(2, 0, -2)
-    glVertex3f(2, 0, 0)
-    glEnd()
-
-    glPopMatrix()
 
 
 # Здесь начинается выполнение программы
