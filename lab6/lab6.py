@@ -12,7 +12,7 @@ a = 0.5
 xrot = 0
 yrot = 0
 
-zpos = 0
+zpos = -8
 
 array_texture = []
 
@@ -87,17 +87,6 @@ def load_texture(file_name: str):
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, array_texture)
 
-    for i in range(1, 3):
-        extra_file_name = file_name.replace(".bmp", "")
-        extra_file_name = "{}{}.bmp".format(extra_file_name, i)
-        image = Image.open(extra_file_name)
-        image.load()  # this is not a list, nor is it list()'able
-        width, height = image.size
-
-        array_texture = np.asarray(image, dtype='uint8')
-        array_texture = array_texture[::-1]
-        glTexImage2D(GL_TEXTURE_2D, i, GL_RGB, width, height,
-                     0, GL_RGB, GL_UNSIGNED_BYTE, array_texture)
 
 
 # Процедура перерисовки
@@ -198,8 +187,8 @@ def draw_cube():
     glVertex3f(2, 2, 0)
     glEnd()
 
-    ss = [0.5, 0.0, 0.0]
-    tt = [0.0, 0.0, 0.5]
+    ss = [1, 0.0, 0.0, 0.1]
+    tt = [0.0, 0.0, 1, 0.1]
 
     glTexGenfv(GL_S, GL_OBJECT_PLANE, ss)
     glTexGenfv(GL_T, GL_OBJECT_PLANE, tt)

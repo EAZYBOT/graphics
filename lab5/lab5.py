@@ -51,7 +51,7 @@ def init():
     glEnable(GL_AUTO_NORMAL)  # Включаем один источник света
 
     glEnable(GL_LIGHT0)  # Включаем один источник света
-    glEnable(GL_LIGHT1)
+    # glEnable(GL_LIGHT1)
 
 
 def draw_directional_light():
@@ -84,23 +84,23 @@ def draw():
     glLoadIdentity()
     glPushMatrix()
 
-    glTranslatef(-2, 0, 0)
-    glMaterial(GL_FRONT, GL_DIFFUSE, (0.2, 0.9, 0.2, 1))
-    glMaterial(GL_FRONT, GL_SPECULAR, (0.4, 0.4, 0.4, 1))
+    glTranslatef(-0.8, 0, 0)
+    glMaterial(GL_FRONT, GL_DIFFUSE, (0.9, 0.9, 0.2, 1))
+    glMaterial(GL_FRONT, GL_SPECULAR, (0.9, 0.9, 0.2, 1))
     glMaterial(GL_FRONT, GL_SHININESS, 30)
     glutSolidSphere(0.5, 15, 15)
     glPopMatrix()
 
     glPushMatrix()
     glLoadIdentity()
-    glMaterial(GL_FRONT, GL_DIFFUSE, (0.9, 0.2, 0.2, 1))
-    glMaterial(GL_FRONT, GL_SPECULAR, (0.1, 0.1, 0.1, 1))
+    glMaterial(GL_FRONT, GL_DIFFUSE, (0.2, 0.2, 0.9, 1))
+    glMaterial(GL_FRONT, GL_SPECULAR, (0.2, 0.2, 0.9, 1))
     glTranslatef(2, 0, 0)
     glutSolidSphere(0.5, 30, 30)
     glPopMatrix()
 
     glPushMatrix()  # Возвращаем сохраненное положение "камеры"
-    glTranslatef(-0.8, 0, 0)
+    glTranslatef(-2, 0, 0)
     glRotatef(xrot, 1, 0, 0)
     glRotatef(yrot, 0, 1, 0)
     glMaterial(GL_FRONT, GL_DIFFUSE, (0.2, 0.2, 0.9, 1))

@@ -7,8 +7,8 @@ import math as m
 import numpy
 
 # Объявляем все глобальные переменные
-global xRot # Величина вращения по оси x
-global zPos # Величина вращения по оси y
+global xrot # Величина вращения по оси x
+global yrot # Величина вращения по оси y
 a=0.3
 
 clientwidth = 200
@@ -16,8 +16,8 @@ clientheight = 200
 
 # Процедура инициализации
 def init():
-    global xRot # Величина вращения по оси x
-    global zPos # Величина вращения по оси y
+    global xrot # Величина вращения по оси x
+    global yrot # Величина вращения по оси y
 
     xrot = 0.0 # Величина вращения по оси x = 0
     yrot = 0.0 # Величина вращения по оси y = 0
@@ -29,8 +29,8 @@ def init():
 
 # Процедура обработки специальных клавиш
 def specialkeys(key, x, y):
-    global xRot
-    global zPos
+    global xrot
+    global yrot
 
     # Обработчики для клавиш со стрелками
     if key == GLUT_KEY_UP:      # Клавиша вверх
@@ -86,7 +86,7 @@ def drawimageTrimetric():
     drawfigura()
 
 def drawimageDimetric():
-    fz = 5 / 9;
+    fz = 5 / 9
     glViewport(300, 200, clientwidth, clientheight)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -108,7 +108,7 @@ def drawimageIsometric():
     glRotatef(-45, 0, 1, 0)
     drawfigura()
 
-def drawimageCabinet():
+def drawimageCavalier():
     glViewport(900, 400, clientwidth, clientheight)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -121,7 +121,7 @@ def drawimageCabinet():
     glLoadMatrixf(matr)
     drawfigura()
 
-def drawimageCavalier():
+def drawimageCabinet():
     glViewport(900, 200, clientwidth, clientheight)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -271,8 +271,9 @@ def draw():
     drawimageTrimetric()
     drawimageDimetric()
     drawimageIsometric()
-    drawimageCabinet()
+
     drawimageCavalier()
+    drawimageCabinet()
 
     drawimagePerOnePoint()
     drawimagePerTwoPoint()
