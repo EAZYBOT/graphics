@@ -20,8 +20,6 @@ isTreeLightEnabled = True
 isFireplaceLightEnabled = True
 isMoonLightEnabled = True
 
-lightX = 0
-lightZ = 0
 treeLightH = 0
 
 global bark_texture
@@ -170,11 +168,8 @@ def drawWalls(xSize, ySize, zSize):
     glPushMatrix()
 
     # glEnable(GL_CULL_FACE)
-    glCullFace(GL_BACK)
-    glFrontFace(GL_CW)
-
-    glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, (1, 0.5, 1, 1))
-    glMaterial(GL_FRONT_AND_BACK, GL_SHININESS, 50)
+    # glCullFace(GL_BACK)
+    # glFrontFace(GL_CW)
 
     glTranslatef(-xSize / 2, -ySize / 2, -zSize / 2)
     glEnable(GL_TEXTURE_2D)
@@ -216,10 +211,13 @@ def drawWalls(xSize, ySize, zSize):
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
     glVertex3f(xSize, 0, 0)
+
     glTexCoord2f(0.0, 1.0)
     glVertex3f(xSize, ySize, 0)
+
     glTexCoord2f(1.0, 1.0)
     glVertex3f(xSize, ySize, zSize)
+
     glTexCoord2f(1.0, 0.0)
     glVertex3f(xSize, 0, zSize)
     glEnd()
@@ -245,10 +243,13 @@ def drawWalls(xSize, ySize, zSize):
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
     glVertex3f(0, 0, 0)
+
     glTexCoord2f(1.0, 0.0)
     glVertex3f(xSize, 0, 0)
+
     glTexCoord2f(1.0, 1.0)
     glVertex3f(xSize, 0, zSize)
+
     glTexCoord2f(0.0, 1.0)
     glVertex3f(0, 0, zSize)
     glEnd()
@@ -266,7 +267,6 @@ def drawWalls(xSize, ySize, zSize):
 
     glTexCoord2f(1.0, 0.0)
     glVertex3f(xSize, ySize, 0)
-
     glEnd()
 
     glDisable(GL_TEXTURE_2D)
@@ -290,7 +290,6 @@ def drawRoom():
 def drawTree(xSize, ySize):
     glPushMatrix()
 
-    glDisable(GL_CULL_FACE)
     glTranslatef(-xSize / 2, -ySize / 2, 0)
     glEnable(GL_TEXTURE_2D)
 
@@ -323,7 +322,6 @@ def drawTree(xSize, ySize):
 
     glDisable(GL_TEXTURE_2D)
     glDisable(GL_BLEND)
-
     glPopMatrix()
 
 
@@ -340,22 +338,15 @@ def drawTreeLight():
         colors.append(1)
 
         glEnable(GL_LIGHT3)
-        glLight(GL_LIGHT3, GL_POSITION, (0, 30, 0, 1))
+        glLight(GL_LIGHT3, GL_POSITION, (-15, 0, -25, 1))
         glLight(GL_LIGHT3, GL_DIFFUSE, colors)
-        glLight(GL_LIGHT3, GL_SPOT_DIRECTION, (0, 0, -1))
-        glLight(GL_LIGHT3, GL_SPOT_CUTOFF, 90)
-        glLight(GL_LIGHT3, GL_SPECULAR, (1, 1, 1, 1))
 
-        # glLight(GL_LIGHT3, GL_CONSTANT_ATTENUATION, 0)
-        # glLight(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, 0.000)
         glPopMatrix()
     else:
         glDisable(GL_LIGHT3)
 
 
 def drawPlayerLight():
-    global lightZ
-    global lightX
     global xRot
     global xPos
     global zPos
@@ -364,13 +355,10 @@ def drawPlayerLight():
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
         glLoadIdentity()
-        glTranslate(xPos, 0, -zPos + 20)
         glEnable(GL_LIGHT1)
         glLight(GL_LIGHT1, GL_POSITION, (xPos, 0, -zPos + 20, 1))
         glLight(GL_LIGHT1, GL_AMBIENT, (0.2, 0.2, 0.2, 1))
         glLight(GL_LIGHT1, GL_DIFFUSE, (0.4, 0.4, 0.4, 1))
-        direction = (0, 1, 0)
-        glLight(GL_LIGHT1, GL_SPOT_DIRECTION, direction)
         glLight(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0)
         glLight(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0004)
         glPopMatrix()
@@ -383,8 +371,7 @@ def drawMoonLight():
     glLoadIdentity()
     color = convertColors(0, 14, 60, 255)
 
-    # glLight(GL_LIGHT4, GL_POSITION, (1, 1, -1, 0))
-    glLight(GL_LIGHT4, GL_POSITION, (0, 0, 1, 0))
+    glLight(GL_LIGHT4, GL_POSITION, (1, 0, -1, 0))
     glLight(GL_LIGHT4, GL_DIFFUSE, color)
     glLight(GL_LIGHT4, GL_SPECULAR, color)
     glPopMatrix()
@@ -395,9 +382,6 @@ def convertColors(r, g, b, a):
 
 
 def drawFireplaceLight():
-    global lightZ
-    global lightX
-
     if isFireplaceLightEnabled:
         glPushMatrix()
         glLoadIdentity()
@@ -405,8 +389,6 @@ def drawFireplaceLight():
         glEnable(GL_LIGHT2)
         glLight(GL_LIGHT2, GL_POSITION, (0, 1, 75, 1))
         glLight(GL_LIGHT2, GL_DIFFUSE, convertColors(241, 128, 53, 255))
-        glLight(GL_LIGHT2, GL_SPOT_DIRECTION, (0, 0, -1))
-        glLight(GL_LIGHT2, GL_SPOT_CUTOFF, 90)
         glLight(GL_LIGHT2, GL_SPECULAR, convertColors(241, 128, 53, 255))
 
         glLight(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 0)
@@ -416,7 +398,6 @@ def drawFireplaceLight():
         glDisable(GL_LIGHT2)
 
 
-# Процедура перерисовки
 def draw():
     global xRot
     global zPos
@@ -424,27 +405,21 @@ def draw():
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
-    # glPushMatrix()
-    glMatrixMode(GL_MODELVIEW)
     drawPlayerLight()
     drawMoonLight()
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 500.0)
-    # glRotate(-90, 0, 1, 0)
     glRotate(xRot, 0, 1, 0)
 
     y = -math.sin(math.radians(playerHeight)) * 3
     glTranslate(-xPos, y, zPos)
     glMatrixMode(GL_MODELVIEW)
-    # glPopMatrix()
-
     drawRoom()
-    glutSwapBuffers()  # Выводим все нарисованное в памяти на экран
+    glutSwapBuffers()
 
 
-# Процедура инициализации
 def init():
     global bark_texture
     global tree_texture
@@ -456,16 +431,12 @@ def init():
 
     glClearColor(0, 0, 0, 1.0)
     glMatrixMode(GL_PROJECTION)
-    glOrtho(-5.0, 5.0, -10.0, 10.0, -5.0, 1000.0)  # Определяем границы рисования по горизонтали и вертикали
-
+    glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 500.0)
+    
     glMatrixMode(GL_MODELVIEW)
     glEnable(GL_DEPTH_TEST)
-    glEnable(GL_LIGHTING)  # Включаем освещение
-    # glEnable(GL_LIGHT1)
-    glEnable(GL_LIGHT2)
-    # glEnable(GL_LIGHT0)
+    glEnable(GL_LIGHTING)
     glShadeModel(GL_SMOOTH)
-    glEnable(GL_AUTO_NORMAL)
     glAlphaFunc(GL_GREATER, 0.5)
     glEnable(GL_ALPHA_TEST)
 
